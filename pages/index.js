@@ -1,6 +1,8 @@
 import Head from "next/head";
 import Link from "next/link";
 import {useUser} from '@auth0/nextjs-auth0/client';
+import { getSession } from "next-auth/react";
+
 
 export default function Home() {
   const {isLoading, error, user} = useUser();
@@ -42,11 +44,17 @@ export default function Home() {
 
 export const getServerSideProps = async (ctx) => {
   const session = await getSession(ctx.req, ctx.res);
-  if (!!session) {
+  if (session) {
     return {
       redirect: {
         destination: "/chat",
-      }
-    }
+        permanent: false, // You can set this based on your requirements
+      },
+    };
   }
-}
+
+  // Return an object for the case when there is no session
+  return {
+    props: {}, // You can return empty props or any other props needed for your page
+  };
+};
